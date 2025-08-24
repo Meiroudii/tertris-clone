@@ -1,19 +1,7 @@
 #!/usr/bin/env python3
-"""
-Letris (Pygame) - full Tetris clone with:
- - 7-bag next queue (5 preview)
- - Hold piece (C)
- - Ghost piece preview
- - Soft drop / hard drop
- - Scoring and level progression
- - Basic wall kicks
-Author: generated for Sveitlania
-"""
-
 import pygame, random, sys, time
 from collections import deque
 
-# ----- Config -----
 CELL = 30
 COLS, ROWS = 10, 20
 WIDTH, HEIGHT = COLS * CELL + 200, ROWS * CELL  # side panel added
@@ -27,12 +15,10 @@ SOFT_DROP_MS = 40
 ARE_AFTER_LOCK_MS = 200  # small delay after lock (feel)
 LOCK_DELAY_MS = 500
 
-# Scoring (classic-ish)
 SCORES = {0: 0, 1: 100, 2: 300, 3: 500, 4: 800}
 SOFT_DROP_SCORE = 1
 HARD_DROP_SCORE = 2  # per row
 
-# Colors
 BLACK = (10, 10, 10)
 GRAY = (40, 40, 40)
 WHITE = (230, 230, 230)
@@ -439,9 +425,9 @@ def draw_side_panel(screen, state, font):
 def main():
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Letris (Pygame) - Full")
+    pygame.display.set_caption("Pytris")
     clock = pygame.time.Clock()
-    font = pygame.font.SysFont("Consolas", 18)
+    font = pygame.font.SysFont("Consolas", 21)
 
     state = GameState()
 
@@ -455,34 +441,47 @@ def main():
                 pygame.quit()
                 sys.exit()
             elif ev.type == pygame.KEYDOWN:
-                if ev.key == pygame.K_ESCAPE:
-                    pygame.quit(); sys.exit()
-                if ev.key == pygame.K_p:
-                    state.paused = not state.paused
-                if ev.key == pygame.K_r:
-                    state = GameState()
-                if ev.key == pygame.K_c:
-                    state.hold_action()
-                if ev.key == pygame.K_SPACE:
-                    state.hard_drop()
-                if ev.key == pygame.K_UP:
-                    state.try_rotate_with_kick(cw=True)
-                if ev.key == pygame.K_z:
-                    state.try_rotate_with_kick(cw=False)
-                if ev.key == pygame.K_LEFT:
-                    if not state.collision(state.active, -1, 0):
-                        state.active.x -= 1
-                        if state.grounded:
-                            state.reset_lock_timer()
-                if ev.key == pygame.K_RIGHT:
-                    if not state.collision(state.active, 1, 0):
-                        state.active.x += 1
-                        if state.grounded:
-                            state.reset_lock_timer()
-                if ev.key == pygame.K_DOWN:
-                    # one-time step (soft)
-                    state.soft_drop()
-
+                match ev.key:
+                    case pygame.K_ESCAPE:
+                        pygame.quit(); sys.ext()
+                    case pygame.K_p:
+                        state.paused = not state.paused
+                    case pygame.K_c:
+                        state.hold_action()
+                    case pygame.K_z:
+                        state.try_rotate_with_kick(cw=False)
+                    case pygame.K_r:
+                        state = GameState()
+                    case pygame.K_SPACE:
+                        state.hard_drop()
+                    case pygame.K_UP:
+                        state.try_rotate_with_kick(cw=True)
+                    case pygame.K_DOWN:
+                        state.soft_drop()
+                    case pygame.K_LEFT:
+                        if not state.collision(state.active, -1, 0):
+                            state.active.x -= 1
+                            if state.grounded:
+                                state.reset_lock_timer()
+                    case pygame.K_RIGHT:
+                        if not state.collision(state.active, 1, 0):
+                            state.active.x += 1
+                            if state.grounded:
+                                state.reset_lock_timer()
+                    case pygame.K_w:
+                        state.try_rotate_with_kick(cw=True)
+                    case pygame.K_s:
+                        state.soft_drop()
+                    case pygame.K_a:
+                        if not state.collision(state.active, -1, 0):
+                            state.active.x -= 1
+                            if state.grounded:
+                                state.reset_lock_timer()
+                    case pygame.K_d:
+                        if not state.collision(state.active, 1, 0):
+                            state.active.x += 1
+                            if state.grounded:
+                                state.reset_lock_timer()
         # gravity / tick
         state.tick()
 
